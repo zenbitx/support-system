@@ -23,7 +23,7 @@
 
                 [
                     'title' => 'Admin Dashboard',
-                    'route' => '',
+                    'route' => 'admin.dashboard',
                     'icon' => 'fa fa-th',
                     'permission' => '',
                 ],
@@ -543,22 +543,22 @@
             {{-- Section Label --}}
             @if(($menu['type'] ?? null) === 'label')
 
-                @can($menu['permission'] ?? null)
+                @if(!empty($menu['permission']) && !auth()->can($menu['permission']))
+                    @continue
+                @endif
 
-                    <div class="sidebar-heading">
-                        {{ $menu['label'] }}
-                    </div>
-
-                @endcan
+                <div class="sidebar-heading">
+                    {{ $menu['label'] }}
+                </div>
 
                 @continue
             @endif
 
 
-            {{-- Permission --}}
-            @can($menu['permission'] ?? null)
+            {{-- Permission Check (Skip if user lacks permission) --}}
+            @if(!empty($menu['permission']) && !auth()->can($menu['permission']))
                 @continue
-            @endcan
+            @endif
 
 
             {{-- Menu With Children --}}
@@ -569,12 +569,6 @@
                     $collapseId = 'sidebar-' . md5($menu['title']);
 
                     $isActive = false;
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Check Child Routes
-                    |--------------------------------------------------------------------------
-                    */
 
                     foreach ($menu['children'] as $child) {
 
@@ -587,12 +581,6 @@
                         }
 
                     }
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Check Parent Active Routes
-                    |--------------------------------------------------------------------------
-                    */
 
                     if (!$isActive && !empty($menu['active_routes'])) {
 
@@ -642,18 +630,15 @@
 
                             @foreach($menu['children'] as $child)
 
-                                {{-- @if(!canViewMenu($child['permission'] ?? null))
-                                    @continue
-                                @endif --}}
-
-                                @if(empty($child['route']))
+                                {{-- Check Child Permission --}}
+                                @if(!empty($child['permission']) && !auth()->can($child['permission']))
                                     @continue
                                 @endif
 
                                 <li>
 
-                                    <a href="{{ route($child['route']) }}"
-                                       class="{{ request()->routeIs($child['route']) ? 'active' : '' }}">
+                                    <a href="{{ !empty($child['route']) ? route($child['route']) : '#' }}"
+                                       class="{{ !empty($child['route']) && request()->routeIs($child['route']) ? 'active' : '' }}">
 
                                         @if(!empty($child['icon']))
                                             <i class="{{ $child['icon'] }}"></i>
@@ -681,7 +666,7 @@
 
                 <div class="sidebar-item">
 
-                    <a href="{{ $menu['route'] ? route($menu['route']) : '' }}"
+                    <a href="{{ !$menu['route'] ? route($menu['route']) : '#' }}"
                        class="sidebar-link {{ request()->routeIs($menu['route']) ? 'active' : '' }}">
 
                         <span class="sidebar-link-left">
@@ -757,26 +742,28 @@
 
     <div class="offcanvas-body p-0">
 
-        {{-- Reuse the same menu --}}
+        {{-- Reuse the same menu logic --}}
         <div class="sidebar-menu">
 
             @foreach($menus as $menu)
 
                 @if(($menu['type'] ?? null) === 'label')
 
-                    {{-- @if(canViewMenu($menu['permission'] ?? null)) --}}
-                        <div class="sidebar-heading">
-                            {{ $menu['label'] }}
-                        </div>
-                    {{-- @endif --}}
+                    @if(!empty($menu['permission']) && !auth()->can($menu['permission']))
+                        @continue
+                    @endif
 
-                    {{-- @continue --}}
+                    <div class="sidebar-heading">
+                        {{ $menu['label'] }}
+                    </div>
+
+                    @continue
                 @endif
 
 
-                {{-- @if(!canViewMenu($menu['permission'] ?? null))
+                @if(!empty($menu['permission']) && !auth()->can($menu['permission']))
                     @continue
-                @endif --}}
+                @endif
 
 
                 @if(!empty($menu['children']))
@@ -824,22 +811,18 @@
 
                                 @foreach($menu['children'] as $child)
 
-                                    {{-- @if(!canViewMenu($child['permission'] ?? null))
-                                        @continue
-                                    @endif --}}
-
-                                    @if(empty($child['route']))
+                                    @if(!empty($child['permission']) && !auth()->can($child['permission']))
                                         @continue
                                     @endif
 
                                     <li>
 
-                                        <a href="{{ route($child['route']) }}"
-                                           class="{{ request()->routeIs($child['route']) ? 'active' : '' }}">
+                                        <a href="{{ !empty($child['route']) ? route($child['route']) : '#' }}"
+                                           class="{{ !empty($child['route']) && request()->routeIs($child['route']) ? 'active' : '' }}">
 
                                             <i class="{{ $child['icon'] ?? 'fa fa-circle' }}"></i>
 
-                                            {{ $child['title'] }}
+                                            <span>{{ $child['title'] }}</span>
 
                                         </a>
 
@@ -857,7 +840,7 @@
 
                     <div class="sidebar-item">
 
-                        <a href="{{ route($menu['route']) }}"
+                        <a href="{{ $menu['route'] ? route($menu['route']) : '#' }}"
                            class="sidebar-link {{ request()->routeIs($menu['route']) ? 'active' : '' }}">
 
                             <span class="sidebar-link-left">
