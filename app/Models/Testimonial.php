@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Testimonial extends Model
+{
+    use HasFactory;
+
+    protected $table = 'testimonial';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'designation',
+        'testimonial',
+        'entry_date',
+        'status',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'entry_date' => 'datetime',
+        ];
+    }
+}
