@@ -11,7 +11,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon" type="image/x-icon" href="{{asset ('assets/img/LogoFav-PhotoRoom.png')}}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{asset('assets/images/icon-logo/apple-touch-icon.png')}}">
+	<link rel="icon" type="image/png" href="{{asset('assets/images/icon-logo/logo.png')}}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{{asset('assets/images/icon-logo/favicon-32x32.png')}}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/images/icon-logo/favicon-16x16.png')}}">
+	<link rel="manifest" href="{{asset('assets/images/icon-logo/manifest.json')}}">
+    
     <title>@yield('title', 'Home') - {{ config('app.name', 'Laravel') }}</title>
 
     {{-- Bootstrap / Font Awesome --}}
